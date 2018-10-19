@@ -59,6 +59,11 @@ def board_moves(board):
 		for c in range(0, n_c):
 			position = make_pos(l, c)
 			list_pos.append(position)
+	#verificar posicoes possiveis,(?) encontrar posicoes que tenham na vizinhanca uma ou + posicoes vazias
+	# if (make_pos(pos_l(position)+1, pos_c(position))) in list_pos:
+	# if (make_pos(pos_l(position), pos_c(position)+1))) in list_pos:
+	# if (make_pos(pos_l(position)-1, pos_c(position))) in list_pos:
+	# if (make_pos(pos_l(position), pos_c(position)-1))) in list_pos:
 	return list_pos
 
 # board_perform_move(board): Movimentos possiveis no tabuleiro
