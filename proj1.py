@@ -51,8 +51,15 @@ def move_final(move):
 
 # board_moves(board): Movimentos possiveis no tabuleiro
 def board_moves(board):
-	new_board = deepcopy(board)
-	return new_board
+	n_l = len(board)
+	n_c = len(board[0])
+	list_pos = []
+	# generate the mapping of the board as positions in list_pos
+	for l in range(0, n_l):
+		for c in range(0, n_c):
+			position = make_pos(l, c)
+			list_pos.append(position)
+	return list_pos
 
 # board_perform_move(board): Movimentos possiveis no tabuleiro
 def board_perform_move(board, move):
@@ -113,7 +120,7 @@ class solitaire(Problem):
 #"""Needed for informed search."""
 	#state = node.state
 	
-board = [["O","O","O","X"], ["O","O","O","O"], ["O","_","O","_"], ["O","O","O","O"]]
+#board = [["O","O","O","X"], ["O","O","O","O"], ["O","_","O","_"], ["O","O","O","O"]]
 #board = [[c_peg(), c_peg(), c_peg(), c_blocked()], [c_peg(), c_peg(), c_peg(), c_peg()], [c_peg(), c_empty(), c_peg(), c_empty()], [c_peg(), c_peg(), c_peg(), c_peg()]]
 
 #game = solitaire(board)
