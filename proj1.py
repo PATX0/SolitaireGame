@@ -62,22 +62,22 @@ def board_moves(board):
 		if is_empty(board[l][c]): 
 			neigh_d2 = getNeighbours(pos, board) #lista de vizinhos de pos com dist = 2
 			for i in range(0, len(neigh_d2)):
-				aux2_l = pos_l(neigh_d2[i])
-				aux2_c = pos_c(neigh_d2[i])
-				if is_peg(board[aux2_l][aux2_c]):
-					if aux2_l < l:	#verifica se a peca a mover esta a esquerda da posicao vazia 
+				aux_l = pos_l(neigh_d2[i])
+				aux_c = pos_c(neigh_d2[i])
+				if is_peg(board[aux_l][aux_c]):
+					if aux_l < l:	#verifica se a peca a mover esta a esquerda da posicao vazia 
 						if is_peg(board[l-1][c]): #verifica se a posicao entre ambas e uma peca valida
 							moves.append(make_move(neigh_d2[i], pos))
 
-					if aux2_l > l:	#verifica se a peca a mover esta a direita da posicao vazia
+					if aux_l > l:	#verifica se a peca a mover esta a direita da posicao vazia
 						if is_peg(board[l+1][c]):
 							moves.append(make_move(neigh_d2[i], pos))
 
-					if aux2_c < c:	#verifica se a peca a mover esta acima da posicao vazia
+					if aux_c < c:	#verifica se a peca a mover esta acima da posicao vazia
 						if is_peg(board[l][c-1]):
 							moves.append(make_move(neigh_d2[i], pos))
 
-					if aux2_c > c: #verifica se a posicao a mover esta abaixo da posicao vazia
+					if aux_c > c: #verifica se a posicao a mover esta abaixo da posicao vazia
 						if is_peg(board[l][c+1]):
 							moves.append(make_move(neigh_d2[i], pos))
 
