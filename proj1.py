@@ -49,6 +49,26 @@ def move_initial(move):
 def move_final(move):
 	return move[1]
 
+# TAI board
+
+def getContent(board, pos):
+	return board[pos_l(pos)][pos_c(pos)]
+
+def setContent(board, pos, content):
+	board[pos_l(pos)][pos_c(pos)] = content
+
+def removePegRight(board, pos, content):
+	board[pos_l(pos)][pos_c(pos)+1] = content
+	
+def removePegLeft(board, pos, content):
+	board[pos_l(pos)][pos_c(pos)-1] = content
+
+def removePegUp(board, pos, content):
+	board[pos_l(pos)-1][pos_c(pos)] = content
+
+def removePegDown(board, pos, content):
+	board[pos_l(pos)+1][pos_c(pos)] = content
+
 # board_moves(board): Movimentos possiveis no tabuleiro
 
 def board_moves(board):
@@ -62,22 +82,22 @@ def board_moves(board):
 		if is_empty(board[l][c]): 
 			neigh_d2 = getNeighbours(pos, board) #lista de vizinhos de pos com dist = 2
 			for i in range(0, len(neigh_d2)):
-				aux_l = pos_l(neigh_d2[i])
-				aux_c = pos_c(neigh_d2[i])
-				if is_peg(board[aux_l][aux_c]):
-					if aux_l < l:	#verifica se a peca a mover esta a esquerda da posicao vazia 
+				aux2_l = pos_l(neigh_d2[i])
+				aux2_c = pos_c(neigh_d2[i])
+				if is_peg(board[aux2_l][aux2_c]):
+					if aux2_l < l:	#verifica se a peca a mover esta a esquerda da posicao vazia 
 						if is_peg(board[l-1][c]): #verifica se a posicao entre ambas e uma peca valida
 							moves.append(make_move(neigh_d2[i], pos))
 
-					if aux_l > l:	#verifica se a peca a mover esta a direita da posicao vazia
+					if aux2_l > l:	#verifica se a peca a mover esta a direita da posicao vazia
 						if is_peg(board[l+1][c]):
 							moves.append(make_move(neigh_d2[i], pos))
 
-					if aux_c < c:	#verifica se a peca a mover esta acima da posicao vazia
+					if aux2_c < c:	#verifica se a peca a mover esta acima da posicao vazia
 						if is_peg(board[l][c-1]):
 							moves.append(make_move(neigh_d2[i], pos))
 
-					if aux_c > c: #verifica se a posicao a mover esta abaixo da posicao vazia
+					if aux2_c > c: #verifica se a posicao a mover esta abaixo da posicao vazia
 						if is_peg(board[l][c+1]):
 							moves.append(make_move(neigh_d2[i], pos))
 
@@ -86,8 +106,30 @@ def board_moves(board):
 
 # board_perform_move(board): Movimentos possiveis no tabuleiro
 def board_perform_move(board, move):
-	board_cpy = deepcopy(board)
-	return board_cpy
+	boardcopy = copy.deepcopy(board)
+	
+	linit = pos_l(move_initial(move))
+	lfinal = pos_l(move_final(move))
+	cinit = pos_c(move_initial(move))
+	cfinal = pos_c(move_initial(move))
+	
+	if linit < lfinal: #ve se o movimento e da esquerda para a direita
+		removePegRight(boardcopy, move_initial(move), c_empty())
+	
+	if linit > lfinal: #ve se o movimento e da direita para a esquerda
+		removePegLeft(boardcopy, move_initial(move), c_empty())
+
+	if cinit < cfinal: #ve se o movimento e de cima para baixo
+		removePegDown(boardcopy, move_initial(move), c_empty())
+	
+	if cinit > cfinal: #ve se o movimento e de baixo para cima
+		removePegUp(boardcopy, move_initial(move), c_empty())
+	         
+	setContent(boardcopy, move_initial(move), c_empty())
+	setContent(boardcopy, move_final(move), c_peg())
+	
+	return boardcopy
+
 
 #def check_return_empty(list_pos, board):
 #	res = []
@@ -97,7 +139,6 @@ def board_perform_move(board, move):
 #		if is_empty(board[l][c]):
 #			res.append(list_pos[i])
 #	return res
-
 	
 def countPegs(board):
 	count = 0
