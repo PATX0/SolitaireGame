@@ -58,21 +58,6 @@ def setContent(board, pos, content):
 	board[pos_l(pos)][pos_c(pos)] = content
 	return board
 
-def removePegRight(board, pos, content):
-	board[pos_l(pos)][pos_c(pos)+1] = content
-	return board
-
-def removePegLeft(board, pos, content):
-	board[pos_l(pos)][pos_c(pos)-1] = content
-	return board
-
-def removePegUp(board, pos, content):
-	board[pos_l(pos)-1][pos_c(pos)] = content
-	return board
-
-def removePegDown(board, pos, content):
-	board[pos_l(pos)+1][pos_c(pos)] = content
-	return board
 
 # _____________________________________________________________________________________________________
 
@@ -179,20 +164,19 @@ def getNeighbours(pos, board): #retorna lista com vizinhos a distancia = 2 para 
 	res = []
 	if l > 1: 	#garante que 2 posicoes a esquerda e uma posicao valida	
 		res.append(make_pos(l-2, c))
-	if l < n_ls-2:
+	if l < n_ls-2:	#garante que 2 posicoes a direita e uma posicao valida	
 		res.append(make_pos(l+2, c))    
-	if c > 1:	#garante que 2 posicoes a baixo e uma posicao valida
+	if c > 1:	
 		res.append(make_pos(l, c-2))
-	if c < n_cs-2:
+	if c < n_cs-2:	
 		res.append(make_pos(l, c+2))
 	
 	return sorted(res)
 
 
-
 def map_positions_board(n_l, n_c, board):
 	list_pos = []
-	# generate the mapping of the board as positions in list_pos
+	#cria lista de posicoes do board
 	for l in range(0, n_l):
 		for c in range(0, n_c):
 			position = make_pos(l, c)
@@ -200,9 +184,10 @@ def map_positions_board(n_l, n_c, board):
 	return list_pos
 
 
-def hfunc(node): 
-	nP = countPegs(node.state.board)
-	return nP
+def hfunc(node): #funcao h para execucao 
+	moves = board_moves(node.state.board)
+	return len(moves)
+			
 
 # _____________________________________________________________________________________________________
 # classes
@@ -239,40 +224,47 @@ class solitaire(Problem):
 		return c+1
 
 #heuristicas para procura, recolher info relevante para melhorar a performance da procura(distancia, vizinhos, pos vazias...)
-	def h(self, node): 
+	def h(self, node): # numero de moves possiveis
 		moves = board_moves(node.state.board)
-		nP = countPegs(node.state.board)
-		return nP
+		return len(moves)
+
+	def h1(self, node):  # numero de posicoes vazias
+		nE = countEmpty(node.state.board)
+		return nE
 
 # _____________________________________________________________________________________________________
 # execucao das searchs
 
-
+# board 5x5
 board0 = [["_","O","O","O","_"],["O","_","O","_","O"],["_","O","_","O","_"],["O","_","O","_","_"],["_","O","_","_","_"]]
+# board 4x4
 board1 = [["O","O","O","X"],["O","O","O","O"],["O","_","O","O"],["O","O","O","O"]]
+# board 4x5
 board2 = [["O","O","O","X","X"],["O","O","O","O","O"],["O","_","O","_","O"],["O","O","O","O","O"]]
+# board 4x6
 board3 = [["O","O","O","X","X","X"],["O","_","O","O","O","O"],["O","O","O","O","O","O"], ["O","O","O","O","O","O"]]
+
 def runBoards():
-    boards = (board0, board1, board2, board3)
-    bn = 0
-    for board in boards:
-        bn += 1
-        print()
-        pd = InstrumentedProblem(solitaire(deepcopy(board)))
-        pg = InstrumentedProblem(solitaire(deepcopy(board)))
-        pa = InstrumentedProblem(solitaire(deepcopy(board)))
-        print("Board Number:",bn)
-        start = time.time()
-        depth_first_tree_search(pd)
-        print("Depth First Time: ", "{0:.2f}".format(time.time() - start))
-        print("Depth First: expanded-"+str(pd.succs)+" generated-"+str(pd.states))
-        start = time.time()
-        greedy_best_first_graph_search(pg, hfunc)
-        print("Greedy Time: ", "{0:.2f}".format(time.time() - start))
-        print("Greedy     : expanded-"+str(pg.succs)+" generated-"+str(pg.states))
-       # start = time.time()
-       # astar_search(pa)
-      #  print("A* Time: ", "{0:.2f}".format(time.time() - start)) 
-      #  print("Astar      : expanded-"+str(pa.succs)+" generated-"+str(pa.states))
+	boards = (board0, board1, board2, board3)
+	bn = -1
+	for board in boards:
+		bn += 1
+		print()
+		pd = InstrumentedProblem(solitaire(deepcopy(board)))
+		pg = InstrumentedProblem(solitaire(deepcopy(board)))
+		pa = InstrumentedProblem(solitaire(deepcopy(board)))
+		print("Board Number:",bn)
+		start = time.time()
+		depth_first_tree_search(pd)
+		print("Depth First Time: ", "{0:.3f}".format(time.time() - start))
+		# print("Depth First: expanded-"+str(pd.succs)+" generated-"+str(pd.states))
+		start = time.time()
+		greedy_best_first_graph_search(pg, hfunc)
+		print("Greedy Time: ", "{0:.3f}".format(time.time() - start))
+		# print("Greedy     : expanded-"+str(pg.succs)+" generated-"+str(pg.states))
+		#start = time.time()
+		#astar_search(pa)
+		#print("A* Time: ", "{0:.3f}".format(time.time() - start)) 
+		# print("Astar      : expanded-"+str(pa.succs)+" generated-"+str(pa.states))
 
 
