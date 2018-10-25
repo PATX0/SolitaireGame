@@ -200,6 +200,10 @@ def map_positions_board(n_l, n_c, board):
 	return list_pos
 
 
+def hfunc(node): 
+	nP = countPegs(node.state.board)
+	return nP
+
 # _____________________________________________________________________________________________________
 # classes
 
@@ -234,15 +238,41 @@ class solitaire(Problem):
 	def path_cost(self, c, state1, action, state2):
 		return c+1
 
-
-#heuristicas para procura, recolher varias informacoes relevantes para melhorar a performance da procura(distancia, vizinhos, pos vazias...)
-#	def h(self, node): 
-#"""Needed for informed search."""
-		#moves = board_moves(node.state.board)
-		
+#heuristicas para procura, recolher info relevante para melhorar a performance da procura(distancia, vizinhos, pos vazias...)
+	def h(self, node): 
+		moves = board_moves(node.state.board)
+		nP = countPegs(node.state.board)
+		return nP
 
 # _____________________________________________________________________________________________________
-# execution
+# execucao das searchs
 
+
+board0 = [["_","O","O","O","_"],["O","_","O","_","O"],["_","O","_","O","_"],["O","_","O","_","_"],["_","O","_","_","_"]]
+board1 = [["O","O","O","X"],["O","O","O","O"],["O","_","O","O"],["O","O","O","O"]]
+board2 = [["O","O","O","X","X"],["O","O","O","O","O"],["O","_","O","_","O"],["O","O","O","O","O"]]
+board3 = [["O","O","O","X","X","X"],["O","_","O","O","O","O"],["O","O","O","O","O","O"], ["O","O","O","O","O","O"]]
+def runBoards():
+    boards = (board0, board1, board2, board3)
+    bn = 0
+    for board in boards:
+        bn += 1
+        print()
+        pd = InstrumentedProblem(solitaire(deepcopy(board)))
+        pg = InstrumentedProblem(solitaire(deepcopy(board)))
+        pa = InstrumentedProblem(solitaire(deepcopy(board)))
+        print("Board Number:",bn)
+        start = time.time()
+        depth_first_tree_search(pd)
+        print("Depth First Time: ", "{0:.2f}".format(time.time() - start))
+        print("Depth First: expanded-"+str(pd.succs)+" generated-"+str(pd.states))
+        start = time.time()
+        greedy_best_first_graph_search(pg, hfunc)
+        print("Greedy Time: ", "{0:.2f}".format(time.time() - start))
+        print("Greedy     : expanded-"+str(pg.succs)+" generated-"+str(pg.states))
+       # start = time.time()
+       # astar_search(pa)
+      #  print("A* Time: ", "{0:.2f}".format(time.time() - start)) 
+      #  print("Astar      : expanded-"+str(pa.succs)+" generated-"+str(pa.states))
 
 
