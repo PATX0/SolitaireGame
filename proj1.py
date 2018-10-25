@@ -249,11 +249,11 @@ def runBoards():
 	b = -1
 	for board in boards:
 		b += 1
-		pd = InstrumentedProblem(solitaire(deepcopy(board)))
-		pg = InstrumentedProblem(solitaire(deepcopy(board)))
-		pa = InstrumentedProblem(solitaire(deepcopy(board)))
+		pd = InstrumentedProblem(solitaire(board))
+		pg = InstrumentedProblem(solitaire(board))
+		pa = InstrumentedProblem(solitaire(board))
 		print()
-		print("Board Number:",bn)
+		print("Board Number:",b)
 		start = time()
 		depth_first_tree_search(pd)
 		print("Depth First Time: ", "{0:.3f}".format(time() - start))
