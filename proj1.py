@@ -4,7 +4,7 @@
 
 from search import *
 from copy import *
-import time
+from time import *
 
 # _____________________________________________________________________________________________________
 
@@ -245,26 +245,25 @@ board2 = [["O","O","O","X","X"],["O","O","O","O","O"],["O","_","O","_","O"],["O"
 board3 = [["O","O","O","X","X","X"],["O","_","O","O","O","O"],["O","O","O","O","O","O"], ["O","O","O","O","O","O"]]
 
 def runBoards():
-	boards = (board0, board1, board2, board3)
-	bn = -1
+	boards = [board0, board1, board2, board3]
+	b = -1
 	for board in boards:
-		bn += 1
-		print()
+		b += 1
 		pd = InstrumentedProblem(solitaire(deepcopy(board)))
 		pg = InstrumentedProblem(solitaire(deepcopy(board)))
 		pa = InstrumentedProblem(solitaire(deepcopy(board)))
+		print()
 		print("Board Number:",bn)
-		start = time.time()
+		start = time()
 		depth_first_tree_search(pd)
-		print("Depth First Time: ", "{0:.3f}".format(time.time() - start))
-		# print("Depth First: expanded-"+str(pd.succs)+" generated-"+str(pd.states))
-		start = time.time()
+		print("Depth First Time: ", "{0:.3f}".format(time() - start))
+		start = time()
 		greedy_best_first_graph_search(pg, hfunc)
-		print("Greedy Time: ", "{0:.3f}".format(time.time() - start))
-		# print("Greedy     : expanded-"+str(pg.succs)+" generated-"+str(pg.states))
-		#start = time.time()
+		print("Greedy Time: ", "{0:.3f}".format(time() - start))
+		print("------------------------------------------------------------\n")
+		#start = time()
 		#astar_search(pa)
-		#print("A* Time: ", "{0:.3f}".format(time.time() - start)) 
-		# print("Astar      : expanded-"+str(pa.succs)+" generated-"+str(pa.states))
+		#print("A* Time: ", "{0:.3f}".format(time() - start))
+		#print("------------------------------------------------------------\n")
 
 
