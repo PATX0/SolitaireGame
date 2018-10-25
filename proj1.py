@@ -127,10 +127,10 @@ def board_perform_move(board, move):
 			boardcopy[linit-1][cinit] = c_empty() 
 
 		if cinit < cfinal: #verifica se o move e da esquerda para a direita
-			board[linit][cinit+1] = c_empty() 
+			boardcopy[linit][cinit+1] = c_empty() 
 	
 		if cinit > cfinal: #verifica se o move e da direita para a esquerda
-			board[linit][cinit-1] = c_empty() 
+			boardcopy[linit][cinit-1] = c_empty() 
 	         
 		setContent(boardcopy, move_initial(move), c_empty())
 		setContent(boardcopy, move_final(move), c_peg())
@@ -209,7 +209,7 @@ class sol_state:
 		self.board = board
 
 	def __lt__(self, other):
-		return len(board_moves(self.board)) > len(board_moves(other.board))
+		return countEmpty(self.board) < countEmpty(other.board)
 
 
 class solitaire(Problem):
@@ -219,8 +219,10 @@ class solitaire(Problem):
 		self.initial = sol_state(board)
 
 	def actions(self, state):
-		result = board_moves(state.board)
-		return result 
+		moves = board_moves(state.board)
+		#for move in moves:
+		#	board_perform_move(state.board, move)
+		return moves
 
 	def result(self, state, action): #executar move(action) no estado e devolver o novo estado
 		res = board_perform_move(state.board, action)
@@ -242,40 +244,5 @@ class solitaire(Problem):
 # _____________________________________________________________________________________________________
 # execution
 
-board05 = [["O","O","_","X","X","X"],["O","_","O","O","O","O"],["_","O","O","_","O","O"],["O","O","O","_","O","O"]]
-board07 = [["O","O","_","X","X","X"],["O","_","O","O","O","O"],["_","O","O","_","O","O"],["O","O","_","X","X","X"]]
-board09 = [["_","O","O","O","_"],["O","_","O","_","O"],["_","O","_","O","_"],["O","_","O","_","_"],["_","O","_","_","_"]]
-board11 = [["_","O","O","O","_"],["O","_","O","O","O"],["_","O","_","O","_"],["O","_","O","_","_"],["_","O","_","_","_"]]
 
-def runBoards():
-    boards = (board05, board07, board09, board11)
-    bn = 3
-    for board in boards:
-        bn += 2
-        print()
-        pd = InstrumentedProblem(solitaire(deepcopy(board)))
-        pg = InstrumentedProblem(solitaire(deepcopy(board)))
-        pa = InstrumentedProblem(solitaire(deepcopy(board)))
-        print("Board Number:",bn,'\n')
-        start = time.time()
-        resultD = depth_first_tree_search(pd)
-        print("Depth First Time: ", "{0:.2f}".format(time.time() - start))
-        print("Depth First: expanded-"+str(pd.succs)+" generated-"+str(pd.states))
-        start = time.time()
-        resultG = greedy_best_first_graph_search(pg, countEmpty())
-        print("Greedy Time: ", "{0:.2f}".format(time.time() - start))
-        print("Greedy     : expanded-"+str(pg.succs)+" generated-"+str(pg.states))
-        start = time.time()
-        resultA = astar_search(pa)
-        print("A* Time: ", "{0:.2f}".format(time.time() - start)) 
-        print("Astar      : expanded-"+str(pa.succs)+" generated-"+str(pa.states))
-		#resultD.solution()
-		#resultG.solution()
-		#resultA.solution()
-		#resultD.path()
-		#resultG.path()
-		#resultA.path()
-
-#game = solitaire(board)
-#p = InstrumentedProblem(game)
 

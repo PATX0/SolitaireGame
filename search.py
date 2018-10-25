@@ -399,6 +399,12 @@ def astar_search(problem, h=None):
     h = memoize(h or problem.h, 'h')
     return best_first_graph_search(problem, lambda n: n.path_cost + h(n))
 
+def greedy_search(problem, h=None):
+    """f(n) = h(n)"""
+    h = memoize(h or problem.h, 'h')
+    return best_first_graph_search(problem, h)
+
+
 # ______________________________________________________________________________
 # Other search algorithms
 
