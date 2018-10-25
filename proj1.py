@@ -1,15 +1,14 @@
 #! /usr/bin/python3
-# Grupo 88 - Tiago Soares 78658; Goncalo Correia 83897;
+# Grupo 56 - Tiago Soares 78658; Goncalo Correia 83897;
 # Projecto 1 IA 18-19
 
 from search import *
 from copy import *
+import time
 
-
-# ______________________________________________________________________________
+# _____________________________________________________________________________________________________
 
 # TAI content
-
 def c_peg():
 	return "O"
 
@@ -40,6 +39,7 @@ def pos_l(pos):
 def pos_c(pos):
 	return pos[1]
 
+
 # TAI move
 # Lista [p_initial, p_final]
 def make_move(i, f):
@@ -49,28 +49,34 @@ def move_initial(move):
 def move_final(move):
 	return move[1]
 
-# TAI board
 
+# TAI board
 def getContent(board, pos):
 	return board[pos_l(pos)][pos_c(pos)]
 
 def setContent(board, pos, content):
 	board[pos_l(pos)][pos_c(pos)] = content
+	return board
 
 def removePegRight(board, pos, content):
 	board[pos_l(pos)][pos_c(pos)+1] = content
-	
+	return board
+
 def removePegLeft(board, pos, content):
 	board[pos_l(pos)][pos_c(pos)-1] = content
+	return board
 
 def removePegUp(board, pos, content):
 	board[pos_l(pos)-1][pos_c(pos)] = content
+	return board
 
 def removePegDown(board, pos, content):
 	board[pos_l(pos)+1][pos_c(pos)] = content
+	return board
+
+# _____________________________________________________________________________________________________
 
 # board_moves(board): Movimentos possiveis no tabuleiro
-
 def board_moves(board):
 	n_l = len(board)
 	n_c = len(board[0])
@@ -80,56 +86,61 @@ def board_moves(board):
 		l = pos_l(pos)
 		c = pos_c(pos)
 		if is_empty(board[l][c]): 
-			neigh_d2 = getNeighbours(pos, board) #lista de vizinhos de pos com dist = 2
-			for i in range(0, len(neigh_d2)):
-				aux2_l = pos_l(neigh_d2[i])
-				aux2_c = pos_c(neigh_d2[i])
-				if is_peg(board[aux2_l][aux2_c]):
-					if aux2_l < l:	#verifica se a peca a mover esta a esquerda da posicao vazia 
+			neigh = getNeighbours(pos, board) #lista de vizinhos de pos com dist = 2
+			for i in range(0, len(neigh)):
+				aux_l = pos_l(neigh[i])
+				aux_c = pos_c(neigh[i])
+				if is_peg(board[aux_l][aux_c]):
+					if aux_l < l:	#verifica se a peca a mover esta a esquerda da posicao vazia 
 						if is_peg(board[l-1][c]): #verifica se a posicao entre ambas e uma peca valida
-							moves.append(make_move(neigh_d2[i], pos))
+							moves.append(make_move(neigh[i], pos))
 
-					if aux2_l > l:	#verifica se a peca a mover esta a direita da posicao vazia
+					if aux_l > l:	#verifica se a peca a mover esta a direita da posicao vazia
 						if is_peg(board[l+1][c]):
-							moves.append(make_move(neigh_d2[i], pos))
+							moves.append(make_move(neigh[i], pos))
 
-					if aux2_c < c:	#verifica se a peca a mover esta acima da posicao vazia
+					if aux_c < c:	#verifica se a peca a mover esta acima da posicao vazia
 						if is_peg(board[l][c-1]):
-							moves.append(make_move(neigh_d2[i], pos))
+							moves.append(make_move(neigh[i], pos))
 
-					if aux2_c > c: #verifica se a posicao a mover esta abaixo da posicao vazia
+					if aux_c > c: #verifica se a posicao a mover esta abaixo da posicao vazia
 						if is_peg(board[l][c+1]):
-							moves.append(make_move(neigh_d2[i], pos))
+							moves.append(make_move(neigh[i], pos))
 
 	return moves
 
 
-# board_perform_move(board): Movimentos possiveis no tabuleiro
+# board_perform_move(board): executa move no board, retirando a posicao entre move initial e final
 def board_perform_move(board, move):
-	boardcopy = copy.deepcopy(board)
-	
+	boardcopy = deepcopy(board)
+	moves = board_moves(board)
+	#nr da linha e coluna das posicoes de move
 	linit = pos_l(move_initial(move))
 	lfinal = pos_l(move_final(move))
 	cinit = pos_c(move_initial(move))
-	cfinal = pos_c(move_initial(move))
-	
-	if linit < lfinal: #ve se o movimento e da esquerda para a direita
-		removePegRight(boardcopy, move_initial(move), c_empty())
-	
-	if linit > lfinal: #ve se o movimento e da direita para a esquerda
-		removePegLeft(boardcopy, move_initial(move), c_empty())
+	cfinal = pos_c(move_final(move))
+	if move in moves: #move valido
+		if linit < lfinal: #verifica se o move e de cima para baixo
+			boardcopy[linit+1][cinit] = c_empty() #remove peca abaixo da peca inicial
+		
+		if linit > lfinal: #verifica se o move e de baixo para cima
+			boardcopy[linit-1][cinit] = c_empty() 
 
-	if cinit < cfinal: #ve se o movimento e de cima para baixo
-		removePegDown(boardcopy, move_initial(move), c_empty())
+		if cinit < cfinal: #verifica se o move e da esquerda para a direita
+			board[linit][cinit+1] = c_empty() 
 	
-	if cinit > cfinal: #ve se o movimento e de baixo para cima
-		removePegUp(boardcopy, move_initial(move), c_empty())
+		if cinit > cfinal: #verifica se o move e da direita para a esquerda
+			board[linit][cinit-1] = c_empty() 
 	         
-	setContent(boardcopy, move_initial(move), c_empty())
-	setContent(boardcopy, move_final(move), c_peg())
-	
+		setContent(boardcopy, move_initial(move), c_empty())
+		setContent(boardcopy, move_final(move), c_peg())
+	else: #se move nao for valido 
+		return board
+
 	return boardcopy
 
+# _____________________________________________________________________________________________________
+# funcoes auxiliares
 
 #def check_return_empty(list_pos, board):
 #	res = []
@@ -140,7 +151,7 @@ def board_perform_move(board, move):
 #			res.append(list_pos[i])
 #	return res
 	
-def countPegs(board):
+def countPegs(board):	#conta numero de pecas
 	count = 0
 	nr_l = len(board)
 	nr_c = len(board[0])
@@ -150,7 +161,7 @@ def countPegs(board):
 				count += 1
 	return count
 
-def countEmpty(board):
+def countEmpty(board):	#conta posicoes vazias
 	count = 0
 	nr_l = len(board)
 	nr_c = len(board[0])
@@ -160,31 +171,22 @@ def countEmpty(board):
 				count += 1
 	return count
 
-def getNeighbours(pos, board):
+def getNeighbours(pos, board): #retorna lista com vizinhos a distancia = 2 para as 4 direcoes
 	n_ls = len(board)
 	n_cs = len(board[0])   
 	l = pos_l(pos)
 	c = pos_c(pos)
-	#res1 = []
-	res2 = []
-	#if l > 0: 		
-	#	res1.append(make_pos(l-1, c))
-	#if l < n_ls-1:
-	#	res1.append(make_pos(l+1, c))    
-	#if c > 0:
-	#	res1.append(make_pos(l, c-1))
-	#if c < n_cs-1:
-	#	res1.append(make_pos(l, c+1))
-	if l > 1: 		
-		res2.append(make_pos(l-2, c))
+	res = []
+	if l > 1: 	#garante que 2 posicoes a esquerda e uma posicao valida	
+		res.append(make_pos(l-2, c))
 	if l < n_ls-2:
-		res2.append(make_pos(l+2, c))    
-	if c > 1:
-		res2.append(make_pos(l, c-2))
+		res.append(make_pos(l+2, c))    
+	if c > 1:	#garante que 2 posicoes a baixo e uma posicao valida
+		res.append(make_pos(l, c-2))
 	if c < n_cs-2:
-		res2.append(make_pos(l, c+2))
+		res.append(make_pos(l, c+2))
 	
-	return sorted(res2)
+	return sorted(res)
 
 
 
@@ -197,6 +199,10 @@ def map_positions_board(n_l, n_c, board):
 			list_pos.append(position)
 	return list_pos
 
+
+# _____________________________________________________________________________________________________
+# classes
+
 class sol_state:
 
 	def __init__(self, board):
@@ -204,7 +210,6 @@ class sol_state:
 
 	def __lt__(self, other):
 		return len(board_moves(self.board)) > len(board_moves(other.board))
-
 
 
 class solitaire(Problem):
@@ -218,7 +223,7 @@ class solitaire(Problem):
 		return result 
 
 	def result(self, state, action): #executar move(action) no estado e devolver o novo estado
-		res = board_perfome_move(state.board, action)
+		res = board_perform_move(state.board, action)
 		return sol_state(res)
 		
 	def goal_test(self, state): #state e solucao se so tiver 1 peca
@@ -229,27 +234,48 @@ class solitaire(Problem):
 
 
 #heuristicas para procura, recolher varias informacoes relevantes para melhorar a performance da procura(distancia, vizinhos, pos vazias...)
-	#def h(self, node): 
+#	def h(self, node): 
 #"""Needed for informed search."""
-	#state = node.state
-	
-#board = [["O","O","O","X"], ["O","O","O","O"], ["O","_","O","_"], ["O","O","O","O"]]
-#board = [[c_peg(), c_peg(), c_peg(), c_blocked()], [c_peg(), c_peg(), c_peg(), c_peg()], [c_peg(), c_empty(), c_peg(), c_empty()], [c_peg(), c_peg(), c_peg(), c_peg()]]
+		#moves = board_moves(node.state.board)
+		
+
+# _____________________________________________________________________________________________________
+# execution
+
+board05 = [["O","O","_","X","X","X"],["O","_","O","O","O","O"],["_","O","O","_","O","O"],["O","O","O","_","O","O"]]
+board07 = [["O","O","_","X","X","X"],["O","_","O","O","O","O"],["_","O","O","_","O","O"],["O","O","_","X","X","X"]]
+board09 = [["_","O","O","O","_"],["O","_","O","_","O"],["_","O","_","O","_"],["O","_","O","_","_"],["_","O","_","_","_"]]
+board11 = [["_","O","O","O","_"],["O","_","O","O","O"],["_","O","_","O","_"],["O","_","O","_","_"],["_","O","_","_","_"]]
+
+def runBoards():
+    boards = (board05, board07, board09, board11)
+    bn = 3
+    for board in boards:
+        bn += 2
+        print()
+        pd = InstrumentedProblem(solitaire(deepcopy(board)))
+        pg = InstrumentedProblem(solitaire(deepcopy(board)))
+        pa = InstrumentedProblem(solitaire(deepcopy(board)))
+        print("Board Number:",bn,'\n')
+        start = time.time()
+        resultD = depth_first_tree_search(pd)
+        print("Depth First Time: ", "{0:.2f}".format(time.time() - start))
+        print("Depth First: expanded-"+str(pd.succs)+" generated-"+str(pd.states))
+        start = time.time()
+        resultG = greedy_best_first_graph_search(pg, countEmpty())
+        print("Greedy Time: ", "{0:.2f}".format(time.time() - start))
+        print("Greedy     : expanded-"+str(pg.succs)+" generated-"+str(pg.states))
+        start = time.time()
+        resultA = astar_search(pa)
+        print("A* Time: ", "{0:.2f}".format(time.time() - start)) 
+        print("Astar      : expanded-"+str(pa.succs)+" generated-"+str(pa.states))
+		#resultD.solution()
+		#resultG.solution()
+		#resultA.solution()
+		#resultD.path()
+		#resultG.path()
+		#resultA.path()
 
 #game = solitaire(board)
 #p = InstrumentedProblem(game)
-#resultD = depth_first_tree_search(p)
-#resultG = greedy_best_first_graph_search(p, p.h)
-#resultA = astar_search(p)
-
-#resultD.solution()
-#resultD.path()
-
-
-
-
-
-
-
-
 
