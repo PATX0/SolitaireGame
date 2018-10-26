@@ -72,25 +72,28 @@ def board_moves(board):
 		c = pos_c(pos)
 		if is_empty(board[l][c]): 
 			neigh = getNeighbours(pos, board) #lista de vizinhos de pos com dist = 2
-			for i in range(0, len(neigh)):
-				aux_l = pos_l(neigh[i])
-				aux_c = pos_c(neigh[i])
-				if is_peg(board[aux_l][aux_c]):
-					if aux_l < l:	#verifica se a peca a mover esta a esquerda da posicao vazia 
-						if is_peg(board[l-1][c]): #verifica se a posicao entre ambas e uma peca valida
-							moves.append(make_move(neigh[i], pos))
+			if not allEmptyNeigh(neigh, board): #se vizinhanca nao for so posicoes vazias
+				for i in range(0, len(neigh)):
+					aux_l = pos_l(neigh[i])
+					aux_c = pos_c(neigh[i])
+					if is_peg(board[aux_l][aux_c]):
+						if aux_l < l:	#verifica se a peca a mover esta a esquerda da posicao vazia 
+							if is_peg(board[l-1][c]): #verifica se a posicao entre ambas e uma peca valida
+								moves.append(make_move(neigh[i], pos))
 
-					if aux_l > l:	#verifica se a peca a mover esta a direita da posicao vazia
-						if is_peg(board[l+1][c]):
-							moves.append(make_move(neigh[i], pos))
+						if aux_l > l:	#verifica se a peca a mover esta a direita da posicao vazia
+							if is_peg(board[l+1][c]):
+								moves.append(make_move(neigh[i], pos))
 
-					if aux_c < c:	#verifica se a peca a mover esta acima da posicao vazia
-						if is_peg(board[l][c-1]):
-							moves.append(make_move(neigh[i], pos))
+						if aux_c < c:	#verifica se a peca a mover esta acima da posicao vazia
+							if is_peg(board[l][c-1]):
+								moves.append(make_move(neigh[i], pos))
 
-					if aux_c > c: #verifica se a posicao a mover esta abaixo da posicao vazia
-						if is_peg(board[l][c+1]):
-							moves.append(make_move(neigh[i], pos))
+						if aux_c > c: #verifica se a posicao a mover esta abaixo da posicao vazia
+							if is_peg(board[l][c+1]):
+								moves.append(make_move(neigh[i], pos))
+			else: # se vizinhanca so tiver posicoes vazias ignora	
+				continue
 
 	return moves
 
@@ -127,15 +130,15 @@ def board_perform_move(board, move):
 # _____________________________________________________________________________________________________
 # funcoes auxiliares
 
-#def check_return_empty(list_pos, board):
-#	res = []
-#	for i in range(0, len(list_pos)):
-#		l = pos_l(list_pos[i])
-#		c = pos_c(list_pos[i])
-#		if is_empty(board[l][c]):
-#			res.append(list_pos[i])
-#	return res
-	
+def allEmptyNeigh(neigh, board):
+	count = 0
+	for i in range(0, len(neigh)):
+		l = pos_l(neigh[i])
+		c = pos_c(neigh[i])
+		if is_empty(board[l][c]):
+			count += 1
+	return count == len(neigh)
+
 def countPegs(board):	#conta numero de pecas
 	count = 0
 	nr_l = len(board)
@@ -184,10 +187,11 @@ def map_positions_board(n_l, n_c, board):
 	return list_pos
 
 
-def hfunc(node): #funcao h para execucao 
-	moves = board_moves(node.state.board)
-	return len(moves)
-			
+def hfunc(node):	# funcao h para execucao 
+	return len(node.state.moves)
+
+def hfunc(node):
+	return countPegs(node.state.board)
 
 # _____________________________________________________________________________________________________
 # classes
@@ -196,6 +200,7 @@ class sol_state:
 
 	def __init__(self, board):
 		self.board = board
+		self.moves = board_moves(board)
 
 	def __lt__(self, other):
 		return countEmpty(self.board) < countEmpty(other.board)
@@ -209,8 +214,6 @@ class solitaire(Problem):
 
 	def actions(self, state):
 		moves = board_moves(state.board)
-		#for move in moves:
-		#	board_perform_move(state.board, move)
 		return moves
 
 	def result(self, state, action): #executar move(action) no estado e devolver o novo estado
@@ -225,12 +228,10 @@ class solitaire(Problem):
 
 #heuristicas para procura, recolher info relevante para melhorar a performance da procura(distancia, vizinhos, pos vazias...)
 	def h(self, node): # numero de moves possiveis
-		moves = board_moves(node.state.board)
-		return len(moves)
+		return len(node.state.moves)
 
-	def h1(self, node):  # numero de posicoes vazias
-		nE = countEmpty(node.state.board)
-		return nE
+	def h(self, node):  # numero de posicoes vazias
+		return countPegs(node.state.board)
 
 # _____________________________________________________________________________________________________
 # execucao das searchs
@@ -260,10 +261,9 @@ def runBoards():
 		start = time()
 		greedy_best_first_graph_search(pg, hfunc)
 		print("Greedy Time: ", "{0:.3f}".format(time() - start))
-		print("------------------------------------------------------------\n")
 		#start = time()
 		#astar_search(pa)
 		#print("A* Time: ", "{0:.3f}".format(time() - start))
-		#print("------------------------------------------------------------\n")
+		print("------------------------------------------------------------\n")
 
 
