@@ -258,12 +258,16 @@ def runBoards():
 		start = time()
 		depth_first_tree_search(pd)
 		print("Depth First Time: ", "{0:.3f}".format(time() - start))
+		print("Depth First      : expanded-"+str(pd.succs)+" generated-"+str(pd.states))
+		print()
 		start = time()
 		greedy_best_first_graph_search(pg, hfunc)
 		print("Greedy Time: ", "{0:.3f}".format(time() - start))
+		print("Greedy      : expanded-"+str(pg.succs)+" generated-"+str(pg.states))
 		#start = time()
 		#astar_search(pa)
 		#print("A* Time: ", "{0:.3f}".format(time() - start))
+		#print("Astar      : expanded-"+str(pa.succs)+" generated-"+str(pa.states))
 		print("------------------------------------------------------------\n")
 
 
